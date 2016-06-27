@@ -40,7 +40,7 @@ BASIC USAGE
 
 Adding a visual with images and metadata:
 
-  from client import CloudClient
+  from ltu.cloud.client import CloudClient
   client = CloudClient(MY_LOGIN, MY_PASSWORD)
   image_files = [image_path1]
   metadata = {'data': 'None'}
@@ -52,7 +52,7 @@ Adding a visual with images and metadata:
 
 Delete a visual:
 
-  from client import CloudClient
+  from ltu.cloud.client import CloudClient
   client = CloudClient(MY_LOGIN, MY_PASSWORD)
   visual_id = ...
   client.delete_visual(visual_id)
@@ -60,7 +60,7 @@ Delete a visual:
 
 Perform an image search:
 
-  from client import CloudClient
+  from ltu.cloud.client import CloudClient
   client = CloudClient(MY_LOGIN, MY_PASSWORD)
   result = client.search_image(image_path)
   print(result)
