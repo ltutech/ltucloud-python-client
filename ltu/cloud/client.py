@@ -1,7 +1,7 @@
 import logging
 import os
 import requests
-from urllib.parse import urlparse
+#from urllib.parse import urlparse
 
 logger = logging.getLogger(__name__)
 
@@ -43,6 +43,15 @@ class CloudClient(object):
         else:
           data.append((key, val))
     return data
+
+
+  def _load_image_data(self, image):
+    """Make sure image is pointing to a data buffer.
+    """
+    if type(image) == str:
+      return open(image, 'rb')
+    else:
+      return image
 
 
   def _post(self, service, params={}, files=None):
@@ -106,9 +115,9 @@ class CloudClient(object):
     Args:
       image: path to image file.
     """
-    logger.info("Search image %s" % image)
-    with open(image, 'rb') as img:
-      return self._post("queries", files={"image": img})
+    image_buffer = self._load_image_data(image)
+    return self._post("queries",
+                      files={"image": image_buffer})
 
 
   def add_visual(self, title, name, project_id, images=[], metadata={}):
@@ -141,8 +150,8 @@ class CloudClient(object):
     """
     for image in images:
       logger.info("Adding image %s to visual %d" % (image, visual_id))
-      with open(image, 'rb') as img:
-        result = self._post("projects/visuals/%d/images/" % visual_id, files={'image':img})
+      image_buffer = self._load_image_data(image)
+      result = self._post("projects/visuals/%d/images/" % visual_id, files={'image':image_buffer})
 
 
   def add_metadata_to_visual(self, visual_id, metadata={}):
