@@ -109,14 +109,17 @@ class CloudClient(object):
         raise Exception("Error while deleting %s (code: %d)" % (url, status_code))
 
 
-  def search_image(self, image):
+  def search_image(self, image, project_ids=[]):
     """Image retrieval based on a image stored on disk
 
     Args:
       image: path to image file.
+      project_ids: list of project to search into
     """
+    logger.info("Search image %s into projects : %s" % (image, project_ids))
     image_buffer = self._load_image_data(image)
     return self._post("queries",
+                      params={"projects": project_ids},
                       files={"image": image_buffer})
 
 
