@@ -126,15 +126,31 @@ class CloudClient(object):
         # create the visual
         params = {'title': title,
                   'name': name}
+        # add the metadatas
+        params.update(self._format_metadata_multipart(metadata))
         result = self._post("projects/%d/visuals/" % project_id, params=params)
         # TODO: manage existing visual
         # collect visual id
         visual_id = result['id']
         # add images
         self.add_images_to_visual(visual_id, images)
-        # add meta data
-        self.add_metadata_to_visual(visual_id, metadata)
         return visual_id
+
+    def _format_metadata_multipart(self, metadatas):
+        """Format metadata to be upload as multipart content."""
+        metas = {}
+        for idx, meta in enumerate(metadatas.items()):
+            metas['metadata-{}-key'.format(idx)] = meta[0]
+            metas['metadata-{}-value'.format(idx)] = meta[1]
+        return metas
+
+    def _format_metadata_json(self, metadatas):
+        """Format metadata to be sent as json content."""
+        metas = {}
+        for meta in metadatas.items():
+            metas['key'] = meta[0]
+            metas['value'] = meta[1]
+        return metas
 
     def add_images_to_visual(self, visual_id, images=[]):
         """Add image fomes to an existing visual_id
@@ -156,10 +172,9 @@ class CloudClient(object):
           visual_id: LTU Cloud visual id
           metadata: dict of metadata to add to the visual
         """
-        for key, value in metadata.items():
-            logger.info("Adding metadata (%s:%s) to visual %d" % (key, value, visual_id))
-            self._post("projects/visuals/%d/metadata/" % visual_id,
-                       params={'key': key, 'value': value})
+        logger.info("Adding metadata %s to visual %d" % (metadata, visual_id))
+        self._post("projects/visuals/%d/metadata/" % visual_id,
+                   params=self._format_metadata_json(metadata))
 
     def delete_visual(self, visual_id):
         """Remove a visual from the database"""
