@@ -1,5 +1,8 @@
 import logging
+import os
+
 import requests
+from requests_toolbelt.multipart.encoder import MultipartEncoder
 
 logger = logging.getLogger(__name__)
 
@@ -42,27 +45,38 @@ class CloudClient(object):
         return data
 
     def _load_image_data(self, image):
-        """Make sure image is pointing to a data buffer.
-        """
+        """Make sure image is a tuple of a name and a data buffer."""
         if type(image) == str:
-            return open(image, 'rb')
+            return (os.path.basename(p=image), open(image, 'rb'))
+        elif not isinstance(image, tuple):
+            return ('image', image)
         else:
             return image
 
-    def _post(self, service, params={}, files=None):
+    def _post(self, service, params={}, files={}):
         """Open corresponding API service with appropriate parameters.
 
         Args:
           service: service name
           params: a dictionary of arguments to be passed to the service
-          files: dict of file object to transfer
+          files: dict of objects to be transfered. Keys must be the param name,
+                 values must be tuples of (filename, file) e.g
+                 {'images-image': ('image.jpg': open('/foo/bar.jpg', 'rb'))}
         Returns:
           The json response content.
         """
-        data = self.get_data(params)
+        data = params
         url = self.get_url(service)
         logger.debug("Posting to '%s'" % url)
-        request = requests.post(url, auth=self.auth, data=data, files=files)
+        headers = {}
+        if files:
+            for file in files.items():
+                data[file[0]] = file[1]
+            data.update(files)
+            # requests_toolbelt MultipartEncoder prevents files from being entirely read into memory
+            data = MultipartEncoder(fields=data)
+            headers['Content-Type'] = data.content_type
+        request = requests.post(url, auth=self.auth, data=data, headers=headers)
         status_code = request.status_code
         answer = request.json()
         if status_code not in [200, 201]:
@@ -113,12 +127,16 @@ class CloudClient(object):
         """
         logger.info("Search image %s into projects : %s" % (image, project_ids))
         image_buffer = self._load_image_data(image)
+        params = {}
+        if project_ids:
+            params = {"projects": project_ids}
         return self._post("queries",
-                          params={"projects": project_ids},
+                          params=params,
                           files={"image": image_buffer})
 
-    def add_visual(self, title, name, project_id, images=[], metadata={}):
-        """Create a new visual with some images
+    def add_visual(self, title, name, project_id, image=None, metadata={}):
+        """Create a new visual.
+
         Returns:
             The visual ID
         """
@@ -128,13 +146,14 @@ class CloudClient(object):
                   'name': name}
         # add the metadatas
         params.update(self._format_metadata_multipart(metadata))
-        result = self._post("projects/%d/visuals/" % project_id, params=params)
+        if image:
+            files = {'images-image': self._load_image_data(image)}
+        else:
+            files = {}
+        result = self._post("projects/%d/visuals/" % project_id, params=params,
+                            files=files)
         # TODO: manage existing visual
-        # collect visual id
-        visual_id = result['id']
-        # add images
-        self.add_images_to_visual(visual_id, images)
-        return visual_id
+        return result['id']
 
     def _format_metadata_multipart(self, metadatas):
         """Format metadata to be upload as multipart content."""
