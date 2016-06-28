@@ -16,7 +16,7 @@ PARAMETERS = {
         'ltu.cloud': 'ltu/cloud',
         'ltu': 'ltu'
     },
-    'install_requires': ['requests==2.10.0'],
+    'install_requires': ['requests>=2.10.0, <3.0'],
     'author': "Jastec France",
     'author_email': "support@jastec.fr",
     'maintainer': "Jastec France",
