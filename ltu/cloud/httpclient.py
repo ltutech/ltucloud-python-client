@@ -141,7 +141,7 @@ class CloudHTTPClient(object):
         """Create a new visual.
 
         Returns:
-            The visual ID
+            The Cloud JSON response
         """
         logger.info("Adding visual: %s / %s" % (title, name))
         # create the visual
@@ -153,10 +153,9 @@ class CloudHTTPClient(object):
             files = {'images-image': self._load_file(image)}
         else:
             files = {}
-        result = self._post("projects/%d/visuals/" % project_id, data=data,
-                            files=files)
         # TODO: manage existing visual
-        return result['id']
+        return self._post("projects/%d/visuals/" % project_id, data=data,
+                          files=files)
 
     def _format_metadata_multipart(self, metadatas):
         """Format metadata to be upload as multipart content."""
