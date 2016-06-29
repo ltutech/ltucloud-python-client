@@ -7,7 +7,7 @@ from requests_toolbelt.multipart.encoder import MultipartEncoder
 logger = logging.getLogger(__name__)
 
 
-class CloudClient(object):
+class CloudHTTPClient(object):
     """This class contains basic methods for accessing the API.
     """
     DEFAULT_QUERY_URL = "https://cloud.ltutech.com/api/v1/"
