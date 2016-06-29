@@ -1,7 +1,8 @@
 #!/usr/bin/env python
+"""ltucloud-python-client setup module."""
 from setuptools import setup
 
-VERSION = "1.0"
+VERSION = "0.2"
 DESCRIPTION = "LTU Cloud API Python client."
 
 PARAMETERS = {
