@@ -67,7 +67,7 @@ class CloudHTTPClient(object):
                  values must be tuples of (filename, file) e.g
                  {'images-image': ('image.jpg': open('/foo/bar.jpg', 'rb'))}
         Returns:
-          The json response content.
+            The requests.Reponse object
         """
         url = self.get_url(service)
         logger.debug("Posting to '%s'" % url)
@@ -79,13 +79,10 @@ class CloudHTTPClient(object):
             # requests_toolbelt MultipartEncoder prevents files from being entirely read into memory
             data = MultipartEncoder(fields=data)
             headers['Content-Type'] = data.content_type
-        request = requests.post(url, auth=self.auth, data=data, headers=headers)
-        status_code = request.status_code
-        answer = request.json()
-        if status_code not in [200, 201]:
-            raise Exception("Error while posting to %s (code: %d, msg: %s)" %
-                            (url, status_code, answer['errors']))
-        return answer
+        try:
+            return requests.post(url, auth=self.auth, data=data, headers=headers)
+        except Exception as e:
+            return requests.Response(reason=str(e), status_code=500)
 
     def _get(self, service, data={}):
         """Open corresponding API service with appropriate parameters.
@@ -94,32 +91,30 @@ class CloudHTTPClient(object):
           service: service name
           data: the request body
         Returns:
-          The json response content.
+          The requests.Reponse object
         """
         data = self.get_data(data)
         url = self.get_url(service)
         logger.debug("Getting from '%s'" % url)
-        request = requests.get(url, auth=self.auth, data=data)
-        status_code = request.status_code
-        answer = request.json()
-        if status_code not in [200, 201]:
-            raise Exception("Error while getting from %s (code: %d, msg: %s)" %
-                            (url, status_code, answer['errors']))
-        return answer
+        try:
+            return requests.get(url, auth=self.auth, data=data)
+        except Exception as e:
+            return requests.Response(reason=str(e), status_code=500)
 
     def _delete(self, service):
         """Open corresponding API service with appropriate parameters.
 
         Args:
           service: service name
+        Returns:
+          The requests.Reponse object
         """
         url = self.get_url(service)
         logger.debug("Deleting '%s'" % url)
-        request = requests.delete(url, auth=self.auth)
-        status_code = request.status_code
-        if status_code not in [204]:
-            raise Exception("Error while deleting %s (code: %d)" %
-                            (url, status_code))
+        try:
+            return requests.delete(url, auth=self.auth)
+        except Exception as e:
+            return requests.Response(reason=str(e), status_code=500)
 
     def search_image(self, image, project_ids=[]):
         """Image retrieval based on a image stored on disk.
@@ -127,6 +122,8 @@ class CloudHTTPClient(object):
         Args:
           image: path to image file.
           project_ids: list of project to search into
+        Returns:
+          The requests.Reponse object
         """
         logger.info("Search image %s into projects : %s" % (image, project_ids))
         image_buffer = self._load_file(image)
@@ -141,7 +138,7 @@ class CloudHTTPClient(object):
         """Create a new visual.
 
         Returns:
-            The Cloud JSON response
+          The requests.Reponse object
         """
         logger.info("Adding visual: %s / %s" % (title, name))
         # create the visual
@@ -179,12 +176,14 @@ class CloudHTTPClient(object):
         Args:
           visual_id: LTU Cloud visual id
           images: list of image files to add to the visual
+        Returns:
+          The requests.Reponse object
         """
         for image in images:
             logger.info("Adding image %s to visual %d" % (image, visual_id))
             image_buffer = self._load_file(image)
-            self._post("projects/visuals/%d/images/" % visual_id,
-                       files={'image': image_buffer})
+            return self._post("projects/visuals/%d/images/" % visual_id,
+                              files={'image': image_buffer})
 
     def add_metadata_to_visual(self, visual_id, metadata={}):
         """Add given metadata to Visual.
@@ -192,12 +191,18 @@ class CloudHTTPClient(object):
         Args:
           visual_id: LTU Cloud visual id
           metadata: dict of metadata to add to the visual
+        Returns:
+          The requests.Reponse object
         """
         logger.info("Adding metadata %s to visual %d" % (metadata, visual_id))
-        self._post("projects/visuals/%d/metadata/" % visual_id,
-                   data=self._format_metadata_json(metadata))
+        return self._post("projects/visuals/%d/metadata/" % visual_id,
+                          data=self._format_metadata_json(metadata))
 
     def delete_visual(self, visual_id):
-        """Remove a visual from the database."""
+        """Remove a visual.
+
+        Returns:
+          The requests.Reponse object
+        """
         logger.info("Deleting visual %d" % visual_id)
-        self._delete("projects/visuals/%d/" % visual_id)
+        return self._delete("projects/visuals/%d/" % visual_id)
