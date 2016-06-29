@@ -44,14 +44,14 @@ class CloudClient(object):
                     data.append((key, val))
         return data
 
-    def _load_image_data(self, image):
-        """Make sure image is a tuple of a name and a data buffer."""
-        if type(image) == str:
-            return (os.path.basename(p=image), open(image, 'rb'))
-        elif not isinstance(image, tuple):
-            return ('image', image)
+    def _load_file(self, file):
+        """Make sure file is a tuple of a name and a data buffer."""
+        if type(file) == str:
+            return (os.path.basename(p=file), open(file, 'rb'))
+        elif not isinstance(file, tuple):
+            return ('file', file)
         else:
-            return image
+            return file
 
     def _post(self, service, params={}, files={}):
         """Open corresponding API service with appropriate parameters.
@@ -126,7 +126,7 @@ class CloudClient(object):
           project_ids: list of project to search into
         """
         logger.info("Search image %s into projects : %s" % (image, project_ids))
-        image_buffer = self._load_image_data(image)
+        image_buffer = self._load_file(image)
         params = {}
         if project_ids:
             params = {"projects": project_ids}
@@ -147,7 +147,7 @@ class CloudClient(object):
         # add the metadatas
         params.update(self._format_metadata_multipart(metadata))
         if image:
-            files = {'images-image': self._load_image_data(image)}
+            files = {'images-image': self._load_file(image)}
         else:
             files = {}
         result = self._post("projects/%d/visuals/" % project_id, params=params,
@@ -180,7 +180,7 @@ class CloudClient(object):
         """
         for image in images:
             logger.info("Adding image %s to visual %d" % (image, visual_id))
-            image_buffer = self._load_image_data(image)
+            image_buffer = self._load_file(image)
             self._post("projects/visuals/%d/images/" % visual_id,
                        files={'image': image_buffer})
 
