@@ -26,23 +26,23 @@ class CloudClient(object):
         """
         return requests.compat.urljoin(self.server_url, service)
 
-    def get_data(self, params={}):
+    def get_data(self, data={}):
         """Return appropriate HTTP POST parameters
 
         Args:
-          params: a dictionary with service-specific parameters
+          data: a dictionary with service-specific parameters
         Returns:
           filtered_params to be passed to requests.
         """
-        data = []
-        for key, val in params.items():
+        _data = []
+        for key, val in data.items():
             if val is not None:
                 if isinstance(val, (list, tuple, set)):
                     for v in val:
-                        data.append((key, v))
+                        _data.append((key, v))
                 else:
-                    data.append((key, val))
-        return data
+                    _data.append((key, val))
+        return _data
 
     def _load_file(self, file):
         """Make sure file is a tuple of a name and a data buffer."""
@@ -53,19 +53,18 @@ class CloudClient(object):
         else:
             return file
 
-    def _post(self, service, params={}, files={}):
+    def _post(self, service, data={}, files={}):
         """Open corresponding API service with appropriate parameters.
 
         Args:
           service: service name
-          params: a dictionary of arguments to be passed to the service
+          data: the request body
           files: dict of objects to be transfered. Keys must be the param name,
                  values must be tuples of (filename, file) e.g
                  {'images-image': ('image.jpg': open('/foo/bar.jpg', 'rb'))}
         Returns:
           The json response content.
         """
-        data = params
         url = self.get_url(service)
         logger.debug("Posting to '%s'" % url)
         headers = {}
@@ -84,16 +83,16 @@ class CloudClient(object):
                             (url, status_code, answer['errors']))
         return answer
 
-    def _get(self, service, params={}):
+    def _get(self, service, data={}):
         """Open corresponding API service with appropriate parameters.
 
         Args:
           service: service name
-          params: a dictionary of arguments to be passed to the service
+          data: the request body
         Returns:
           The json response content.
         """
-        data = self.get_data(params)
+        data = self.get_data(data)
         url = self.get_url(service)
         logger.debug("Getting from '%s'" % url)
         request = requests.get(url, auth=self.auth, data=data)
@@ -127,11 +126,11 @@ class CloudClient(object):
         """
         logger.info("Search image %s into projects : %s" % (image, project_ids))
         image_buffer = self._load_file(image)
-        params = {}
+        data = {}
         if project_ids:
-            params = {"projects": project_ids}
+            data = {"projects": project_ids}
         return self._post("queries",
-                          params=params,
+                          data=data,
                           files={"image": image_buffer})
 
     def add_visual(self, title, name, project_id, image=None, metadata={}):
@@ -142,15 +141,15 @@ class CloudClient(object):
         """
         logger.info("Adding visual: %s / %s" % (title, name))
         # create the visual
-        params = {'title': title,
-                  'name': name}
+        data = {'title': title,
+                'name': name}
         # add the metadatas
-        params.update(self._format_metadata_multipart(metadata))
+        data.update(self._format_metadata_multipart(metadata))
         if image:
             files = {'images-image': self._load_file(image)}
         else:
             files = {}
-        result = self._post("projects/%d/visuals/" % project_id, params=params,
+        result = self._post("projects/%d/visuals/" % project_id, data=data,
                             files=files)
         # TODO: manage existing visual
         return result['id']
@@ -193,7 +192,7 @@ class CloudClient(object):
         """
         logger.info("Adding metadata %s to visual %d" % (metadata, visual_id))
         self._post("projects/visuals/%d/metadata/" % visual_id,
-                   params=self._format_metadata_json(metadata))
+                   data=self._format_metadata_json(metadata))
 
     def delete_visual(self, visual_id):
         """Remove a visual from the database"""
