@@ -1,3 +1,7 @@
+"""Cloud HTTP Client.
+
+Provide utilities to perform queries against LTU Cloud and retrieve the raw responses.
+"""
 import logging
 import os
 
@@ -8,12 +12,13 @@ logger = logging.getLogger(__name__)
 
 
 class CloudHTTPClient(object):
-    """This class contains basic methods for accessing the API.
-    """
+    """This class contains basic methods for accessing the API."""
+
     DEFAULT_QUERY_URL = "https://cloud.ltutech.com/api/v1/"
 
     def __init__(self, login, password, server_url=DEFAULT_QUERY_URL):
-        """Constructor
+        """Constructor.
+
         Args:
           application_key:  authentication key provided by the application.
           server_url:       complete http url to the OnDemand server.
@@ -22,12 +27,11 @@ class CloudHTTPClient(object):
         self.server_url = server_url
 
     def get_url(self, service):
-        """Combine a service name and the server url to produce the service url.
-        """
+        """Combine a service name and the server url to produce the service url."""
         return requests.compat.urljoin(self.server_url, service)
 
     def get_data(self, data={}):
-        """Return appropriate HTTP POST parameters
+        """Return appropriate HTTP POST parameters.
 
         Args:
           data: a dictionary with service-specific parameters
@@ -118,7 +122,7 @@ class CloudHTTPClient(object):
                             (url, status_code))
 
     def search_image(self, image, project_ids=[]):
-        """Image retrieval based on a image stored on disk
+        """Image retrieval based on a image stored on disk.
 
         Args:
           image: path to image file.
@@ -171,7 +175,7 @@ class CloudHTTPClient(object):
         return metas
 
     def add_images_to_visual(self, visual_id, images=[]):
-        """Add image fomes to an existing visual_id
+        """Add image fomes to an existing visual_id.
 
         Args:
           visual_id: LTU Cloud visual id
@@ -184,7 +188,7 @@ class CloudHTTPClient(object):
                        files={'image': image_buffer})
 
     def add_metadata_to_visual(self, visual_id, metadata={}):
-        """Add given metadata to Visual
+        """Add given metadata to Visual.
 
         Args:
           visual_id: LTU Cloud visual id
@@ -195,6 +199,6 @@ class CloudHTTPClient(object):
                    data=self._format_metadata_json(metadata))
 
     def delete_visual(self, visual_id):
-        """Remove a visual from the database"""
+        """Remove a visual from the database."""
         logger.info("Deleting visual %d" % visual_id)
         self._delete("projects/visuals/%d/" % visual_id)
