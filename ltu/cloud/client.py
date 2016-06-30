@@ -42,8 +42,8 @@ class CloudClient(object):
         else:
             return response
 
-    def _deserialize(self, data, serializer):
-        obj, errors = serializer().load(data)
+    def _deserialize(self, data, serializer, many=False):
+        obj, errors = serializer(many=many).load(data)
         if errors:
             raise CloudSerializationException(str(errors))
         else:
@@ -99,3 +99,21 @@ class CloudClient(object):
         cloud_response = self.cloud_http_client.get_visual(visual_id=visual_id)
         cloud_response_json = self._check_response_status(cloud_response, 200).json()
         return self._deserialize(cloud_response_json, VisualSerializer)
+
+    def get_visuals(self, project_id=None, **kwargs):
+        """Retrieve visuals.
+
+        Args:
+            project_id: if provided, get that project's visuals otherwise get all accessible
+                        projects visuals.
+            **kwargs: any additional kwarg will be added to the URL query string (e.g: limit=10)
+        Returns:
+            the visuals
+        Raises:
+            CloudException: if the underlying cloud query went wrong.
+            CloudSerializationException: if an error occurs when deserializing the cloud response.
+        """
+        cloud_response = self.cloud_http_client.get_visuals(project_id=project_id, **kwargs)
+        cloud_response_json = self._check_response_status(cloud_response, 200).json()
+        return self._deserialize(cloud_response_json.get('results', []), VisualSerializer,
+                                 many=True)

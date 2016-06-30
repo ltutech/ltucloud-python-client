@@ -84,7 +84,7 @@ class CloudHTTPClient(object):
         except Exception as e:
             return requests.Response(reason=str(e), status_code=500)
 
-    def _get(self, service, data={}):
+    def _get(self, service, data={}, params={}):
         """Open corresponding API service with appropriate parameters.
 
         Args:
@@ -97,7 +97,7 @@ class CloudHTTPClient(object):
         url = self.get_url(service)
         logger.debug("Getting from '%s'" % url)
         try:
-            return requests.get(url, auth=self.auth, data=data)
+            return requests.get(url, auth=self.auth, data=data, params=params)
         except Exception as e:
             return requests.Response(reason=str(e), status_code=500)
 
@@ -138,6 +138,25 @@ class CloudHTTPClient(object):
         """Retrieve a visual from its id."""
         logger.info("Getting visual with id {}".format(visual_id))
         return self._get("projects/visuals/{}".format(visual_id))
+
+    def get_visuals(self, project_id=None, **kwargs):
+        """Retrieve visuals.
+
+        Args:
+            project_id: if provided, get that project's visuals otherwise get all accessible
+                        projects visuals.
+            **kwargs: any additional kwarg will be added to the URL query string (e.g: limit=10)
+        Returns:
+            The raw Cloud response.
+        """
+        if project_id:
+            log_message = "Getting project {} visuals.".format(project_id)
+            url = "projects/{}/visuals/".format(project_id)
+        else:
+            log_message = "Getting visuals."
+            url = "projects/visuals/"
+        logger.info(log_message)
+        return self._get(url, params=kwargs)
 
     def add_visual(self, title, project_id, name=None, image=None, metadata={}, **kwargs):
         """Create a new visual.
