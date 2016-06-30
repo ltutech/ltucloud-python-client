@@ -68,3 +68,9 @@ class CloudClient(object):
                                 metadata=metadata)
         cloud_response_json = self._check_response_status(cloud_response, 201).json()
         return self._deserialize(cloud_response_json, VisualSerializer)
+
+    def get_visual(self, visual_id):
+        """Retrieve a visual from its id."""
+        cloud_response = self.cloud_http_client.get_visual(visual_id=visual_id)
+        cloud_response_json = self._check_response_status(cloud_response, 200).json()
+        return self._deserialize(cloud_response_json, VisualSerializer)
