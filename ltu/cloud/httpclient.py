@@ -139,7 +139,7 @@ class CloudHTTPClient(object):
         logger.info("Getting visual with id {}".format(visual_id))
         return self._get("projects/visuals/{}".format(visual_id))
 
-    def add_visual(self, title, project_id, name=None, image=None, metadata={}):
+    def add_visual(self, title, project_id, name=None, image=None, metadata={}, **kwargs):
         """Create a new visual.
 
         Returns:
@@ -151,6 +151,8 @@ class CloudHTTPClient(object):
                 'name': name}
         # add the metadatas
         data.update(self._format_metadata_multipart(metadata))
+        # add any other keyword argument
+        data.update(kwargs)
         if image:
             files = {'images-image': self._load_file(image)}
         else:

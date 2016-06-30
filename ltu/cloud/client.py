@@ -66,7 +66,7 @@ class CloudClient(object):
         cloud_response_json = self._check_response_status(cloud_response, 201).json()
         return self._deserialize(cloud_response_json, SearchQuerySerializer)
 
-    def add_visual(self, title, project_id, name=None, image=None, metadata={}):
+    def add_visual(self, title, project_id, name=None, image=None, metadata={}, **kwargs):
         """Create a new visual.
 
         Args:
@@ -81,7 +81,7 @@ class CloudClient(object):
         """
         cloud_response = self.cloud_http_client.add_visual(
                                 title=title, name=name, project_id=project_id, image=image,
-                                metadata=metadata)
+                                metadata=metadata, **kwargs)
         cloud_response_json = self._check_response_status(cloud_response, 201).json()
         return self._deserialize(cloud_response_json, VisualSerializer)
 
