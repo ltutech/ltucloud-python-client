@@ -139,7 +139,7 @@ class CloudHTTPClient(object):
         logger.info("Getting visual with id {}".format(visual_id))
         return self._get("projects/visuals/{}".format(visual_id))
 
-    def add_visual(self, title, name, project_id, image=None, metadata={}):
+    def add_visual(self, title, project_id, name=None, image=None, metadata={}):
         """Create a new visual.
 
         Returns:
