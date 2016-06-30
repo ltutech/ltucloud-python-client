@@ -52,7 +52,15 @@ class CloudClient(object):
     def search_image(self, image, project_ids=[]):
         """Search an image within the given project ids.
 
-        If no project_ids are given, search among all account accessible projects.
+        Args:
+            image: either a filepath or a tuple(name, bytes).
+            project_ids: a list of project ids to search the image in. If no project_ids is
+                         provided, search among all account accessible projects.
+        Returns:
+            the resulting searchQuery object.
+        Raises:
+            CloudException: if the underlying cloud query went wrong.
+            CloudSerializationException: if an error occurs when deserializing the cloud response.
         """
         cloud_response = self.cloud_http_client.search_image(image=image, project_ids=project_ids)
         cloud_response_json = self._check_response_status(cloud_response, 201).json()
@@ -61,7 +69,15 @@ class CloudClient(object):
     def add_visual(self, title, name, project_id, image=None, metadata={}):
         """Create a new visual.
 
-        Return the Cloud response as a models.Visual object.
+        Args:
+            title: the title of the visual to create.
+            name: the name of the visual to create.
+            project_id: the id of the project to create the visual in.
+        Returns:
+            the created visual
+        Raises:
+            CloudException: if the underlying cloud query went wrong.
+            CloudSerializationException: if an error occurs when deserializing the cloud response.
         """
         cloud_response = self.cloud_http_client.add_visual(
                                 title=title, name=name, project_id=project_id, image=image,
@@ -70,7 +86,16 @@ class CloudClient(object):
         return self._deserialize(cloud_response_json, VisualSerializer)
 
     def get_visual(self, visual_id):
-        """Retrieve a visual from its id."""
+        """Retrieve a visual from its id.
+
+        Args:
+            visual_id: the id of the visual to look for.
+        Returns:
+            the visual
+        Raises:
+            CloudException: if the underlying cloud query went wrong.
+            CloudSerializationException: if an error occurs when deserializing the cloud response.
+        """
         cloud_response = self.cloud_http_client.get_visual(visual_id=visual_id)
         cloud_response_json = self._check_response_status(cloud_response, 200).json()
         return self._deserialize(cloud_response_json, VisualSerializer)
