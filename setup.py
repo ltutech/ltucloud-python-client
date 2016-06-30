@@ -18,6 +18,7 @@ PARAMETERS = {
         'ltu': 'ltu'
     },
     'install_requires': [
+        'factory-boy>=2.7.0, <3.0',
         'marshmallow==2.8.0',
         'requests>=2.10.0, <3.0',
         'requests-toolbelt>=0.6.2, <1.0'
