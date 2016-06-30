@@ -156,7 +156,7 @@ class CloudHTTPClient(object):
         else:
             files = {}
         # TODO: manage existing visual
-        return self._post("projects/%d/visuals/" % project_id, data=data,
+        return self._post("projects/%d/visuals/" % int(project_id), data=data,
                           files=files)
 
     def _format_metadata_multipart(self, metadatas):
