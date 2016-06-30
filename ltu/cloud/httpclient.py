@@ -24,7 +24,7 @@ class CloudHTTPClient(object):
           server_url:       complete http url to the OnDemand server.
         """
         self.auth = (login, password)
-        self.server_url = server_url
+        self.server_url = server_url.rstrip('/') + '/'
 
     def get_url(self, service):
         """Combine a service name and the server url to produce the service url."""
