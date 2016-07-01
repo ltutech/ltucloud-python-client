@@ -138,6 +138,8 @@ class MatchedVisual(Visual):
         super().__init__(**kwargs)
         self.match_count = match_count
         self.matched_images = matched_images
+        del self.cover_id
+        del self._media
 
     def __getattribute__(self, name):
         """__getattribute__ override.
