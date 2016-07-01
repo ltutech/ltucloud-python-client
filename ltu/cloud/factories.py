@@ -20,7 +20,7 @@ class ResourceCommonFactory(factory.Factory):
         model = models.ResourceCommon
 
     id = factory.Sequence(lambda n: n)
-    name = factory.LazyAttribute(lambda _: faker.words(nb=1))
+    name = factory.LazyAttribute(lambda _: faker.word())
     created_at = factory.LazyAttribute(lambda _: faker.date_time())
     updated_at = factory.LazyAttribute(lambda _: faker.date_time())
 
@@ -62,7 +62,7 @@ class ImageFactory(ResourceCommonFactory):
     _links = factory.SubFactory(LinksFactory)
     _media = factory.SubFactory(MediaFactory)
     image_md5 = factory.LazyAttribute(lambda _: faker.md5(raw_output=False))
-    source = factory.LazyAttribute(lambda _: faker.words(nb=1))
+    source = factory.LazyAttribute(lambda _: faker.word())
 
 
 class MetadataFactory(ResourceCommonFactory):
@@ -74,9 +74,9 @@ class MetadataFactory(ResourceCommonFactory):
         model = models.Metadata
 
     _links = factory.SubFactory(LinksFactory)
-    key = factory.LazyAttribute(lambda _: faker.words(nb=1))
+    key = factory.LazyAttribute(lambda _: faker.word())
     ordering = factory.Sequence(lambda n: n)
-    value = factory.LazyAttribute(lambda _: faker.words(nb=1))
+    value = factory.LazyAttribute(lambda _: faker.word())
 
 
 class VisualFactory(ResourceCommonFactory):
@@ -94,7 +94,7 @@ class VisualFactory(ResourceCommonFactory):
     _links = factory.SubFactory(LinksFactory)
     _media = factory.SubFactory(MediaFactory)
     nb_images = 1  # number of images to associate to this visual
-    title = factory.LazyAttribute(lambda _: faker.words(nb=1))
+    title = factory.LazyAttribute(lambda _: faker.word())
     project_id = factory.LazyAttribute(lambda _: faker.pyint())
     match_count = factory.LazyAttribute(lambda _: faker.pyint())
     nb_metadatas = 1  # number of metadatas to associate to this visual
