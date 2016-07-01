@@ -5,7 +5,7 @@ This module provides some factories to quickly create LTU Cloud objects.
 import factory
 from faker import Factory as FakerFactory
 
-from .models import Image, Links, Media, Metadata, ResourceCommon, Visual
+from ltu.cloud import models
 
 # create a fake factory
 faker = FakerFactory.create()
@@ -17,7 +17,7 @@ class ResourceCommonFactory(factory.Factory):
     class Meta:
         """Setup the factory model."""
 
-        model = ResourceCommon
+        model = models.ResourceCommon
 
     id = factory.Sequence(lambda n: n)
     name = factory.LazyAttribute(lambda _: faker.words(nb=1))
@@ -31,7 +31,7 @@ class LinksFactory(factory.Factory):
     class Meta:
         """Setup the factory model."""
 
-        model = Links
+        model = models.Links
 
     images = factory.LazyAttribute(lambda _: faker.url())
     metadata = factory.LazyAttribute(lambda _: faker.url())
@@ -45,7 +45,7 @@ class MediaFactory(factory.Factory):
     class Meta:
         """Setup the factory model."""
 
-        model = Media
+        model = models.Media
 
     image = factory.LazyAttribute(lambda _: faker.image_url())
     thumbnail = factory.LazyAttribute(lambda _: faker.image_url())
@@ -57,7 +57,7 @@ class ImageFactory(ResourceCommonFactory):
     class Meta:
         """Setup the factory model."""
 
-        model = Image
+        model = models.Image
 
     _links = factory.SubFactory(LinksFactory)
     _media = factory.SubFactory(MediaFactory)
@@ -71,7 +71,7 @@ class MetadataFactory(ResourceCommonFactory):
     class Meta:
         """Setup the factory model."""
 
-        model = Metadata
+        model = models.Metadata
 
     _links = factory.SubFactory(LinksFactory)
     key = factory.LazyAttribute(lambda _: faker.words(nb=1))
@@ -85,7 +85,7 @@ class VisualFactory(ResourceCommonFactory):
     class Meta:
         """Setup the factory model."""
 
-        model = Visual
+        model = models.Visual
 
         # the following attributes won't be passed to the model class. They're just used as switches
         # or to compute other attributes
