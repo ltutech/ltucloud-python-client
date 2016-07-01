@@ -131,8 +131,8 @@ class MatchSerializer(VisualSerializer):
         return models.Match(**data)
 
 
-class SearchQuerySerializer(ResourceCommonSerializer):
-    """Serialize LTU Cloud SearchQuery."""
+class QuerySerializer(ResourceCommonSerializer):
+    """Serialize LTU Cloud Query."""
 
     _links = fields.Nested(LinksSerializer)
     _media = fields.Nested(MediaSerializer)
@@ -142,5 +142,5 @@ class SearchQuerySerializer(ResourceCommonSerializer):
 
     @post_load
     def make_object(self, data):
-        """Create a SearchQuery from serialized data."""
-        return models.SearchQuery(**data)
+        """Create a Query from serialized data."""
+        return models.Query(**data)

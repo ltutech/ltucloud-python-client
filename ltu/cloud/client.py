@@ -6,7 +6,7 @@ It wraps a CloudHTTPClient and deserializes its responses into objects.
 import logging
 
 from ltu.cloud.httpclient import CloudHTTPClient
-from ltu.cloud.serializers import SearchQuerySerializer, VisualSerializer
+from ltu.cloud.serializers import QuerySerializer, VisualSerializer
 
 
 logger = logging.getLogger(__name__)
@@ -57,14 +57,14 @@ class CloudClient(object):
             project_ids: a list of project ids to search the image in. If no project_ids is
                          provided, search among all account accessible projects.
         Returns:
-            the resulting searchQuery object.
+            the resulting Query object.
         Raises:
             CloudException: if the underlying cloud query went wrong.
             CloudSerializationException: if an error occurs when deserializing the cloud response.
         """
         cloud_response = self.cloud_http_client.search_image(image=image, project_ids=project_ids)
         cloud_response_json = self._check_response_status(cloud_response, 201).json()
-        return self._deserialize(cloud_response_json, SearchQuerySerializer)
+        return self._deserialize(cloud_response_json, QuerySerializer)
 
     def add_visual(self, title, project_id, name=None, image=None, metadata={}, **kwargs):
         """Create a new visual.
@@ -131,7 +131,7 @@ class CloudClient(object):
         """
         cloud_response = self.cloud_http_client.get_query(query_id=query_id)
         cloud_response_json = self._check_response_status(cloud_response, 200).json()
-        return self._deserialize(cloud_response_json, SearchQuerySerializer)
+        return self._deserialize(cloud_response_json, QuerySerializer)
 
     def get_queries(self, **kwargs):
         """Retrieve queries.
@@ -146,5 +146,5 @@ class CloudClient(object):
         """
         cloud_response = self.cloud_http_client.get_queries(**kwargs)
         cloud_response_json = self._check_response_status(cloud_response, 200).json()
-        return self._deserialize(cloud_response_json.get('results', []), SearchQuerySerializer,
+        return self._deserialize(cloud_response_json.get('results', []), QuerySerializer,
                                  many=True)

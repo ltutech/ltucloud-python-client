@@ -166,8 +166,8 @@ class Match:
         self.matched_visual = matched_visual
 
 
-class SearchQuery(ResourceCommon):
-    """Represent LTU Cloud search query."""
+class Query(ResourceCommon):
+    """Represent LTU Cloud query."""
 
     def __init__(self, _links=None, _media=None, matches=[], source=None, source_description=None,
                  **kwargs):
