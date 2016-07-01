@@ -169,9 +169,12 @@ class Match:
 class SearchQuery(ResourceCommon):
     """Represent LTU Cloud search query."""
 
-    def __init__(self, _links=None, _media=None, matches=[], **kwargs):
+    def __init__(self, _links=None, _media=None, matches=[], source=None, source_description=None,
+                 **kwargs):
         """Init fields."""
         super().__init__(**kwargs)
         self._links = _links
         self._media = _media
         self.matches = matches
+        self.source = source
+        self.source_description = source_description

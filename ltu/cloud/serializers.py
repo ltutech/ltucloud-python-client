@@ -137,6 +137,8 @@ class SearchQuerySerializer(ResourceCommonSerializer):
     _links = fields.Nested(LinksSerializer)
     _media = fields.Nested(MediaSerializer)
     matches = fields.Nested(MatchSerializer, many=True)
+    source = fields.Str()
+    source_description = fields.Str()
 
     @post_load
     def make_object(self, data):
