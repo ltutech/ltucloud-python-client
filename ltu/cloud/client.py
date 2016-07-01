@@ -117,3 +117,34 @@ class CloudClient(object):
         cloud_response_json = self._check_response_status(cloud_response, 200).json()
         return self._deserialize(cloud_response_json.get('results', []), VisualSerializer,
                                  many=True)
+
+    def get_query(self, query_id):
+        """Retrieve a query from its id.
+
+        Args:
+            query_id: the id of the visual to look for.
+        Returns:
+            the query
+        Raises:
+            CloudException: if the underlying cloud query went wrong.
+            CloudSerializationException: if an error occurs when deserializing the cloud response.
+        """
+        cloud_response = self.cloud_http_client.get_query(query_id=query_id)
+        cloud_response_json = self._check_response_status(cloud_response, 200).json()
+        return self._deserialize(cloud_response_json, SearchQuerySerializer)
+
+    def get_queries(self, **kwargs):
+        """Retrieve queries.
+
+        Args:
+            **kwargs: any kwarg will be added to the URL query string (e.g: limit=10)
+        Returns:
+            the queries
+        Raises:
+            CloudException: if the underlying cloud query went wrong.
+            CloudSerializationException: if an error occurs when deserializing the cloud response.
+        """
+        cloud_response = self.cloud_http_client.get_queries(**kwargs)
+        cloud_response_json = self._check_response_status(cloud_response, 200).json()
+        return self._deserialize(cloud_response_json.get('results', []), SearchQuerySerializer,
+                                 many=True)

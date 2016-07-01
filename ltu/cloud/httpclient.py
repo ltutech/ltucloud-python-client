@@ -232,3 +232,25 @@ class CloudHTTPClient(object):
         """
         logger.info("Deleting visual %d" % visual_id)
         return self._delete("projects/visuals/%d/" % visual_id)
+
+    def get_query(self, query_id):
+        """Retrieve a query.
+
+        Args:
+            query_id: the id of the query to retrieve.
+        Returns:
+            The raw Cloud response.
+        """
+        logger.info("Getting query with id {}".format(query_id))
+        return self._get("queries/{}".format(query_id))
+
+    def get_queries(self, **kwargs):
+        """Retrieve queries.
+
+        Args:
+            **kwargs: any kwarg will be added to the URL query string (e.g: limit=10)
+        Returns:
+            The raw Cloud response.
+        """
+        logger.info("Getting queries")
+        return self._get("queries/", params=kwargs)
