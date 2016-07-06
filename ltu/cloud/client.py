@@ -34,10 +34,7 @@ class CloudClient(object):
 
     def _check_response_status(self, response, expected_status):
         if response.status_code != expected_status:
-            if response.reason:
-                error_message = response.reason
-            else:
-                error_message = "Internal server error."
+            error_message = response.content or response.reason or "Internal server error."
             raise CloudException(error_message)
         else:
             return response
