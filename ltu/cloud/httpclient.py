@@ -116,12 +116,13 @@ class CloudHTTPClient(object):
         except Exception as e:
             return requests.Response(reason=str(e), status_code=500)
 
-    def search_image(self, image, project_ids=[]):
+    def search_image(self, image, project_ids=[], **kwargs):
         """Image retrieval based on a image stored on disk.
 
         Args:
           image: path to image file.
           project_ids: list of project to search into
+          **kwargs: any additional kwarg will be added to the request body.
         Returns:
           The requests.Reponse object
         """
@@ -130,6 +131,8 @@ class CloudHTTPClient(object):
         data = {}
         if project_ids:
             data = {"projects": project_ids}
+        # add any other keyword argument
+        data.update(kwargs)
         return self._post("queries",
                           data=data,
                           files={"image": image_buffer})

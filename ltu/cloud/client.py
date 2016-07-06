@@ -46,20 +46,22 @@ class CloudClient(object):
         else:
             return obj
 
-    def search_image(self, image, project_ids=[]):
+    def search_image(self, image, project_ids=[], **kwargs):
         """Search an image within the given project ids.
 
         Args:
             image: either a filepath or a tuple(name, bytes).
             project_ids: a list of project ids to search the image in. If no project_ids is
                          provided, search among all account accessible projects.
+             **kwargs: any additional kwarg will be added to the request body.
         Returns:
             the resulting Query object.
         Raises:
             CloudException: if the underlying cloud query went wrong.
             CloudSerializationException: if an error occurs when deserializing the cloud response.
         """
-        cloud_response = self.cloud_http_client.search_image(image=image, project_ids=project_ids)
+        cloud_response = self.cloud_http_client.search_image(image=image, project_ids=project_ids,
+                                                             **kwargs)
         cloud_response_json = self._check_response_status(cloud_response, 201).json()
         return self._deserialize(cloud_response_json, QuerySerializer)
 
