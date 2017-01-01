@@ -46,7 +46,7 @@ class CloudClient(object):
         else:
             return obj
 
-    def search_image(self, image, project_ids=[], **kwargs):
+    def search_image(self, image=None, project_ids=[], **kwargs):
         """Search an image within the given project ids.
 
         Args:

@@ -4,6 +4,7 @@ Provide utilities to perform queries against LTU Cloud and retrieve the raw resp
 """
 import logging
 import os
+import json
 
 import requests
 from requests_toolbelt.multipart.encoder import MultipartEncoder
@@ -57,7 +58,7 @@ class CloudHTTPClient(object):
         else:
             return file
 
-    def _post(self, service, data={}, files={}):
+    def _post(self, service, data={}, files={}, headers={}):
         """Open corresponding API service with appropriate parameters.
 
         Args:
@@ -71,7 +72,6 @@ class CloudHTTPClient(object):
         """
         url = self.get_url(service)
         logger.debug("Posting to '%s'" % url)
-        headers = {}
         if files:
             for file in files.items():
                 data[file[0]] = file[1]
@@ -116,7 +116,7 @@ class CloudHTTPClient(object):
         except Exception as e:
             return requests.Response(reason=str(e), status_code=500)
 
-    def search_image(self, image, project_ids=[], **kwargs):
+    def search_image(self, image=None, url=None, project_ids=[], **kwargs):
         """Image retrieval based on a image stored on disk.
 
         Args:
@@ -127,7 +127,12 @@ class CloudHTTPClient(object):
           The requests.Reponse object
         """
         logger.info("Search image %s into projects : %s" % (image, project_ids))
-        image_buffer = self._load_file(image)
+        if not image and not url:
+            raise RuntimeError('Either image or URL must be provided')
+        if image:
+            image = self._load_file(image)  # Local file
+        elif url:
+            image = url
         data = {}
         if project_ids:
             data = {"projects": project_ids}
@@ -135,7 +140,7 @@ class CloudHTTPClient(object):
         data.update(kwargs)
         return self._post("queries",
                           data=data,
-                          files={"image": image_buffer})
+                          files={"image": image})
 
     def get_visual(self, visual_id):
         """Retrieve a visual from its id."""
@@ -161,7 +166,7 @@ class CloudHTTPClient(object):
         logger.info(log_message)
         return self._get(url, params=kwargs)
 
-    def add_visual(self, title, project_id, name=None, image=None, metadata={}, **kwargs):
+    def add_visual(self, title, project_id, name=None, image=None, url=None, metadata={}, **kwargs):
         """Create a new visual.
 
         Returns:
@@ -175,13 +180,16 @@ class CloudHTTPClient(object):
         data.update(self._format_metadata_multipart(metadata))
         # add any other keyword argument
         data.update(kwargs)
+        files = {}
         if image:
             files = {'images-image': self._load_file(image)}
-        else:
-            files = {}
+        elif url:
+            data['images'] = [{"image": url}]
+            headers = {"Content-Type": "application/json"}
+            data = json.dumps(data)
         # TODO: manage existing visual
         return self._post("projects/%d/visuals/" % int(project_id), data=data,
-                          files=files)
+                          files=files, headers=headers)
 
     def _format_metadata_multipart(self, metadatas):
         """Format metadata to be upload as multipart content."""
