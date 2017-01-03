@@ -181,6 +181,7 @@ class CloudHTTPClient(object):
         # add any other keyword argument
         data.update(kwargs)
         files = {}
+        headers = {}
         if image:
             files = {'images-image': self._load_file(image)}
         elif url:
