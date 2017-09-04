@@ -1,7 +1,7 @@
 """LTU Cloud objects."""
 
 
-class ResourceCommon:
+class ResourceCommon(object):
     """Hold common resources fields."""
 
     def __init__(self, id=None, name=None, created_at=None, updated_at=None, **kwargs):
@@ -16,7 +16,7 @@ class ResourceCommon:
         return "id: {}, name: {}".format(self.id, self.name)
 
 
-class Links:
+class Links(object):
     """Represent LTU Cloud _links.
 
     Each LTU Cloud 'object' has a _links attribute containing some useful links.
@@ -38,7 +38,7 @@ class Links:
                                                                         this.metadata, this.project)
 
 
-class Media:
+class Media(object):
     """Represent LTU Cloud _media."""
 
     def __init__(self, image=None, thumbnail=None, *args, **kwargs):
@@ -56,7 +56,7 @@ class Image(ResourceCommon):
 
     def __init__(self, _links=None, _media=None, image_md5=None, source=None, **kwargs):
         """Init the fields."""
-        super().__init__(**kwargs)
+        super(Image, self).__init__(**kwargs)
         self._links = _links
         self._media = _media
         self.image_md5 = image_md5
@@ -65,7 +65,7 @@ class Image(ResourceCommon):
     def __str__(self):
         """String representation of an Image."""
         return "{}, _links: {}, _media: {}, image_md5: {}, source: {}".format(
-                super().__str__(), self._links, self._media, self.image_md5, self.source)
+                super(Image, self).__str__(), self._links, self._media, self.image_md5, self.source)
 
 
 class MatchedImage(Image):
@@ -76,13 +76,13 @@ class MatchedImage(Image):
 
     def __init__(self, score, **kwargs):
         """Init fields."""
-        super().__init__(**kwargs)
+        super(MatchedImage, self).__init__(**kwargs)
         self.score = score
         # TODO(jpiron): handle result_info
 
     def __str__(self):
         """String representation of an MatchedImage."""
-        return "{}, score: {}".format(super().__str__(), self.score)
+        return "{}, score: {}".format(super(MatchedImage, self).__str__(), self.score)
 
 
 class Metadata(ResourceCommon):
@@ -90,7 +90,7 @@ class Metadata(ResourceCommon):
 
     def __init__(self, key, ordering, value, _links=None, **kwargs):
         """Init the fields."""
-        super().__init__(**kwargs)
+        super(Metadata, self).__init__(**kwargs)
         self._links = _links
         self.key = key
         self.ordering = ordering
@@ -99,7 +99,7 @@ class Metadata(ResourceCommon):
     def __str__(self):
         """String representation of a Metadata."""
         return "{}, _links: {}, key: {}, ordering: {}, value: {}".format(
-                super().__str__(), self._links, self.key, self.ordering, self.value)
+                super(Metadata, self).__str__(), self._links, self.key, self.ordering, self.value)
 
 
 class Visual(ResourceCommon):
@@ -112,7 +112,7 @@ class Visual(ResourceCommon):
         Metadata is in singular form because it is like this in LTU Cloud but it needs to be a list
         of metadata.
         """
-        super().__init__(**kwargs)
+        super(Visual, self).__init__(**kwargs)
         self._links = _links
         self._media = _media
         self.images = images
@@ -135,7 +135,7 @@ class MatchedVisual(Visual):
 
     def __init__(self, match_count=0, matched_images=[], **kwargs):
         """Init fields."""
-        super().__init__(**kwargs)
+        super(MatchedVisual, self).__init__(**kwargs)
         self.match_count = match_count
         self.matched_images = matched_images
         del self.cover_id
@@ -149,10 +149,10 @@ class MatchedVisual(Visual):
         if name == 'images':
             return self.matched_images
         else:
-            return super().__getattribute__(name)
+            return super(MatchedVisual, self).__getattribute__(name)
 
 
-class Match:
+class Match(object):
     """A Match is a MatchedVisual wrapper.
 
     It encapsulates a MatchedVisual and add some attributes.
@@ -174,7 +174,7 @@ class Query(ResourceCommon):
     def __init__(self, _links=None, _media=None, matches=[], source=None, source_description=None,
                  **kwargs):
         """Init fields."""
-        super().__init__(**kwargs)
+        super(Query, self).__init__(**kwargs)
         self._links = _links
         self._media = _media
         self.matches = matches
