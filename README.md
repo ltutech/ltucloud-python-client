@@ -20,17 +20,28 @@ The client comes in the form of a multiplatform python package. Although the
 package has been tested on linux platforms only, it should run fine under
 Windows.
 
-Package can be installed along with dependencies by running:
-
-```bash
-python setup.py install
-```
-
-Note that python 2.6.+ or later is required. Your python version can be
-obtained by running:
-
+Note that python 2.6.+ or later is required.
+To know if python is already installed or to check the version use the following command:
 ```bash
 python --version
+```
+
+In first, install virtualenv  by typing the folling command in a terminal:
+```bash
+sudo apt-get install virtualenv
+
+```
+
+Then, create and activate your dev environment in the project folder.
+```bash
+cd ltucloud-python-client
+virtualenv env
+source env/bin/activate
+```
+
+The package can be installed along with dependencies by running:
+```bash
+python setup.py install
 ```
 
 
